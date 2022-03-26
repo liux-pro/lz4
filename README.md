@@ -1,6 +1,23 @@
+Work with Platform.io
+------------
+this project is forked from [here](https://github.com/lz4/lz4), a fast compression library, written in c.  
+I just add `library.json`, which makes it work for platform.io.  
+You can add this library to you embedded project by edit `platformio.ini`
+```ini
+lib_deps =
+    liux-pro/lz4@^0.0.1
+```
+A simple example for esp8266
+```c
+TBD
+```
+a python script that generate lz4 compressed data on pc
+```python
+TBD
+```
+
 LZ4 - Extremely fast compression
 ================================
-
 LZ4 is lossless compression algorithm,
 providing compression speed > 500 MB/s per core,
 scalable with multi-cores CPU.
