@@ -7,15 +7,53 @@ You can add this library to you embedded project by edit `platformio.ini`
 lib_deps =
     liux-pro/lz4@^0.0.1
 ```
-A simple example for esp8266
-```c
-TBD
-```
-a python script that generate lz4 compressed data on pc
+# some example on esp8266
+## example1 
+a python script that generate lz4 compressed data on pc.  
+full code at https://github.com/liux-pro/monitor-server
 ```python
-TBD
+# pip install lz4
+import lz4.block
+compressedData = lz4.block.compress(bytes(data), store_size=False)
+# then send compressedData to esp8266
 ```
+on esp8266, decompress `compressedData` and save result in  `originData`, both length of them are required.  
+full code at https://github.com/liux-pro/monitor
+```c
+#include "lz4.h"
+LZ4_decompress_safe(compressedData, originData, lengthOfCompressedData, lengthOriginData);
+```
+## example2
+Compress a string and then decompress. Based on example/simple_buffer.c. make sure to check LICENSE before you use is.
+```c
+#include <Arduino.h>
+#include "lz4.h"
 
+void setup()
+{
+    Serial.begin(115200);
+    delay(1000);
+}
+
+void loop()
+{
+    const char *const src = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Lorem ipsum dolor site amat.";
+    const int src_size = (int)(strlen(src) + 1);
+    const int max_dst_size = LZ4_compressBound(src_size);
+    char *compressed_data = (char *)malloc((size_t)max_dst_size);
+    const int compressed_data_size = LZ4_compress_default(src, compressed_data, src_size, max_dst_size);
+    compressed_data = (char *)realloc(compressed_data, (size_t)compressed_data_size);
+
+    /* Decompression */
+    char *const regen_buffer = (char *)malloc(src_size);
+    const int decompressed_size = LZ4_decompress_safe(compressed_data, regen_buffer, compressed_data_size, src_size);
+    Serial.println(regen_buffer);
+    free(compressed_data);
+    free(regen_buffer);
+
+    delay(1000);
+}
+```
 LZ4 - Extremely fast compression
 ================================
 LZ4 is lossless compression algorithm,
